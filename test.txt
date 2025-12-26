@@ -1,0 +1,24 @@
+docker run -d \
+  --name mysql8 \
+  -e MYSQL_ROOT_PASSWORD=123456 \
+  -p 3306:3306 \
+  -v ~/docker-data/mysql/data:/var/lib/mysql \
+  -v ~/docker-data/mysql/conf:/etc/mysql/conf.d \
+  -v ~/docker-data/mysql/logs:/var/log/mysql \
+  --restart=unless-stopped \
+  mysql:8.0.37
+
+
+  # 将本地的 script.sql 复制到容器的 /tmp 目录
+docker cp /Users/zhangquande/Documents/vscodespace/out/mpvue-xbyjShop/server/xbyjShop.sql mysql8:/tmp/xbyjShop.sql
+
+
+mysql -u root -p < /tmp/xbyjShop.sql
+
+xbyjshop
+
+
+select * from xbyjshop_ad
+
+
+SELECT * FROM xbyjshop_user LIMIT 10
