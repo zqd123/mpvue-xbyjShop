@@ -18,7 +18,46 @@ mysql -u root -p < /tmp/xbyjShop.sql
 xbyjshop
 
 
-select * from xbyjshop_ad
+
+dbeaver连接报错解决了，但代码连接mysql报错：
+mysql://root:123456@127.0.0.1:3306/xbyjshop
+Error: ER_NOT_SUPPORTED_AUTH_MODE: Client does not support authentication protocol requested by server; consider upgrading MySQL client
+这个错误是因为 MySQL 8.0+ 使用了新的认证插件 caching_sha2_password，而你的 Node.js 项目中的 mysql模块版本较旧，不支持这个新插件。以下是几种解决方案：
+方案一：修改 MySQL 用户认证方式（推荐）
+在 MySQL 中执行以下命令，将 root 用户的认证插件改为旧版的 mysql_native_password：
+-- 连接到 MySQL 命令行
+mysql -u root -p
+
+-- 执行以下命令
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '123456';
+ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
+FLUSH PRIVILEGES;
 
 
-SELECT * FROM xbyjshop_user LIMIT 10
+这个错误通常发生在使用较新版本的 MySQL 驱动连接数据库时。以下是几种解决方案：
+
+## 方法一：在 DBeaver 连接设置中修改（推荐）
+
+1. 打开 DBeaver，右键点击连接 → **编辑连接**
+2. 转到 **驱动属性** 标签页
+3. 添加/修改以下属性：
+
+| 属性名 | 值 |
+|--------|-----|
+| `allowPublicKeyRetrieval` | `true` |
+| `useSSL` | `false` (如果是开发环境) |
+| `serverTimezone` | `UTC` 或 `Asia/Shanghai` (按需设置) |
+
+
+
+## 其他可能的配置
+
+如果还有问题，可以添加以下属性：
+
+```
+useUnicode=true
+characterEncoding=utf8
+verifyServerCertificate=false
+```
+
+这些配置通常能解决 "Public Key Retrieval is not allowed" 的错误。设置完成后，**测试连接**确认问题是否解决。
